@@ -15,10 +15,11 @@ node{
      }
    stage('4.UploadArtifacts'){
        sh "${mavenHome}/bin/mvn deploy"
+       //http:54.219.26.170:8081/mylandmarktech/repository/tesla-snapshots/
+      //http://54.219.26.170:8081/mylandmarktech/repository/tesla-releases/
       //edit pom.xml distributionManagement TAG with repository details
       //edit setting.xml with nexus-user login credentials
-      //http://54.219.26.170:8081/mylandmarktech/repository/tesla-snapshots/
-      //http://54.219.26.170:8081/mylandmarktech/repository/tesla-releases/
+      
      }
       stage('5.Deploy2UAT'){
        //use deploy-to-container plugin via pipeline syntax  
