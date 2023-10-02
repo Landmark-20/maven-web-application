@@ -28,9 +28,82 @@ pipeline {
             }
         }
 
-        // Include other stages here similarly...
-    }
+        stage('3.CodeQuality') {
+            agent any // This stage can run on any agent
+            steps {
+                script {
+                    def mavenHome = tool name: 'maven3.9.4'
+                    sh "${mavenHome}/bin/mvn sonar:sonar"
+                    // edit pom.xml propertiesTAG with SonarQube server details
+                }
+            }
+        }
 
+        stage('4.UploadArtifacts') {
+            agent any // This stage can run on any agent
+            steps {
+                script {
+                    def mavenHome = tool name: 'maven3.9.4'
+                    sh "${mavenHome}/bin/mvn deploy"
+                    // edit pom.xml distributionManagement TAG with repository details
+                    // edit setting.xml with nexus-user login credentials
+                }
+            }
+        }
+
+        stage('5.Deploy2UAT') {
+            agent any // This stage can run on any agent
+            steps {
+                script {
+                    // use deploy-to-container plugin via pipeline syntax
+                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://172.31.3.54:8177/')], contextPath: null, war: 'target/*war'
+                    // Deploying [/var/lib/jenkins/workspace/tesla-app-pipeline/target/tesla.war]
+                }
+            }
+        }
+
+        stage('6.6ManualApproval') {
+            agent any // This stage can run on any agent
+            steps {
+                sh "echo 'Please review the application performance' "
+                timeout(time: 600, unit: 'MINUTES') {
+                    input message: 'Application ready for deployment, Please review and approve'
+                }
+            }
+        }
+
+        stage('7.Deploy2Prod') {
+            agent any // This stage can run on any agent
+            steps {
+                sh "echo 'Deploy the application to the customers/production' "
+                deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://172.31.3.54:8177/')], contextPath: null, war: 'target/*war'
+            }
+        }
+
+        stage('8.APM') {
+            agent any // This stage can run on any agent
+            steps {
+                sh "echo 'monitoring and observation and alerting' "
+                sh "echo 'application performance Monitoring in progress' "
+            }
+        }
+
+        stage('9.emailNotification') {
+            agent any // This stage can run on any agent
+            steps {
+                sh "echo 'notify the team for unusual occurrences' "
+                sh "echo 'notify the team if the applications are down' "
+                sh "echo 'notify the team if the latency is higher than expected' "
+                emailext body: '''Hi Teams,
+
+                The build and Deployment status for tesla-app follows.
+
+                regards,
+                Landmark Technologies''', recipientProviders: [buildUser(), contributor(), developers(), requestor()], subject: 'build and deployment status', to: 'pklayha@gmail.com'
+            }
+        }
+    }
+    
     post {
         always {
             // Clean up or perform any necessary post-build actions
