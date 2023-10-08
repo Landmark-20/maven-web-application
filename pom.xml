@@ -81,7 +81,7 @@
 			<artifactId>spring-context</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-	<distribution>
+	<dependency>
 	    <repository>
 	      <id>nexus</id>
 	      <name>Landmark Technologies Releases Nexus Repository</name>
@@ -94,7 +94,7 @@
 	      <url>http://172.31.27.180:8081/mylandmarktech/repository/tesla-snapshots/</url>
 	    </snapshotRepository>
 	    
-	</distribution>
+	</dependency>
 	
 	<build>
 		<finalName>tesla</finalName>
