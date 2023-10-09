@@ -52,8 +52,5 @@ The build and Deployment status for tesla-app follows.
 regards,
 Landmark Technologies''', recipientProviders: [buildUser(), contributor(), developers(), requestor()], subject: 'build and deployment status', to: 'pklayha@gmail.com'
     }
-
 */ 
-//   
-
 }
